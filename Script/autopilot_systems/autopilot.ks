@@ -4,8 +4,8 @@ set display_string to "".
 clearguis().
 clearscreen.
 
-set autopilot_gui to get_autopilot_gui().
-set aircraft_state to get_aircraft_state().
+local autopilot_gui to get_autopilot_gui().
+local aircraft_state to get_aircraft_state().
 
 CORE:PART:GETMODULE("kOSProcessor"):DOEVENT("Open Terminal").
 
@@ -28,10 +28,19 @@ function autopilot_loop {
 	handle_gui_speed(autopilot_gui, aircraft_state).
 	handle_gui_systems(autopilot_gui, aircraft_state).
 
-	terminal_debug_print().
+	terminal_debug_print(autopilot_gui, aircraft_state).
 }
 
 function terminal_debug_print {
+	parameter gui, aircraft_state.
+
+	if(false) { // runway info
+		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
+		set display_string to display_string + "dist centerline " + get_distance_to_runway_center_line(selected_runway, aircraft_state) + char(10).
+		set display_string to display_string + "dist runway     " + get_distance_to_runway(selected_runway, aircraft_state) + char(10).
+		set display_string to display_string + "runway angle    " + get_angle_to_runway(selected_runway, aircraft_state) + char(10).
+		set display_string to display_string + "runway altitude " + get_altitude_to_runway(selected_runway, aircraft_state) + char(10).
+	}
 
 	set display_string to display_string + "pitch input  " + ship:control:pitch + char(10).
 	set display_string to display_string + "roll input   " + ship:control:roll + char(10).
@@ -71,13 +80,15 @@ function handle_gui_pitch {
 	
 	set gui:INPUT_ALTITUDE_TEXT:TEXT to gui:INPUT_ALTITUDE + " m".
 	
-	if (false) { //(gui:altitude_glideslope_button:PRESSED) {
+	if (gui:altitude_glideslope_button:PRESSED) {
 		//maintain_altitude_adv(glide_slope_altitude(), 50).
+		
+		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
+		local glide_slope_altitude to get_altitude_to_runway(selected_runway, aircraft_state).
+		set ship:control:pitch to get_commanded_altitude(glide_slope_altitude, aircraft_state) + ship:CONTROL:PILOTPITCH.
 		//set altitude_label:TEXT to round(glide_slope_altitude(), 0) + " m".
 	} else if (gui:altitude_input_button:PRESSED) {
 		set ship:control:pitch to get_commanded_altitude(gui:INPUT_ALTITUDE, aircraft_state) + ship:CONTROL:PILOTPITCH.
-		//set ship:control:pitch to get_commanded_pitch(5, aircraft_state) + ship:CONTROL:PILOTPITCH.
-
 		//set altitude_label:TEXT to input_target_alt + " m".
 	} else if (gui:altitude_manual_button:PRESSED) {
 		set ship:control:PITCH to ship:control:pilotpitch.
@@ -106,9 +117,12 @@ function handle_gui_heading {
 	set gui:input_heading to round(gui:input_heading, 0).
 	set gui:input_heading_text:text to gui:input_heading + " deg".
 	
-	if (false) { //(gui:heading_runway_button:PRESSED) {
-	//	maintain_heading_simple(get_angle_to_runway()).
-	//	set heading_label:TEXT to round(get_angle_to_runway(), 1) + " deg".
+	if (gui:heading_runway_button:PRESSED) {
+		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
+		local target_heading to get_angle_to_runway(selected_runway, aircraft_state).
+		set ship:control:roll to get_commanded_heading(target_heading, aircraft_state) + ship:CONTROL:PILOTROLL.
+		//set heading_label:TEXT to round(get_angle_to_runway(), 1) + " deg".
+
 	} else if (gui:heading_target_button:PRESSED) {
 		local heading_to_target to 0.
 		if(hastarget) {

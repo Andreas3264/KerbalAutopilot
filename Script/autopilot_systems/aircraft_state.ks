@@ -42,7 +42,7 @@ function get_aircraft_config {
 	set config["vspeed_per_m"] to 0.1.	// target vertical speed per altitude
 	set config["max_vspeed"] to 30.		// maximum target vertical speed
 
-	set config["pitch_trim_gain"] to 1.
+	set config["pitch_trim_gain"] to 0.1.
 	set config["pitch_trim"] to 0.
 	
 	set config["speed_response"] to 1 / 10.

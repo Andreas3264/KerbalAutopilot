@@ -15,7 +15,7 @@ function get_autopilot_gui {
 	SET altitude_label:STYLE:ALIGN TO "CENTER".
 
 	local altitude_custom_pane to altitude_pane:ADDHBOX().
-	//set gui["altitude_glideslope_button"] to altitude_custom_pane:ADDRADIOBUTTON("LND").
+	set gui["altitude_glideslope_button"] to altitude_custom_pane:ADDRADIOBUTTON("LND").
 	set gui["altitude_input_button"] to altitude_custom_pane:ADDRADIOBUTTON("IN").
 	set gui["altitude_manual_button"] to altitude_custom_pane:ADDRADIOBUTTON("MAN", true).
 
@@ -41,7 +41,7 @@ function get_autopilot_gui {
 
 	local heading_custom_pane to heading_pane:ADDHBOX().
 	set gui["heading_target_button"] to heading_custom_pane:ADDRADIOBUTTON("TAR").
-	//set gui["heading_runway_button"] to heading_custom_pane:ADDRADIOBUTTON("RUN").
+	set gui["heading_runway_button"] to heading_custom_pane:ADDRADIOBUTTON("RUN").
 	set gui["heading_input_button"] to heading_custom_pane:ADDRADIOBUTTON("IN").
 	set gui["heading_manual_button"] to heading_custom_pane:ADDRADIOBUTTON("MAN", true).
 
@@ -80,6 +80,15 @@ function get_autopilot_gui {
 
 	set gui["speed_plus_10_btn"] to speed_pm_pane:ADDBUTTON("+10").
 	set gui["speed_plus_50_btn"] to speed_pm_pane:ADDBUTTON("+50").
+
+
+	// RUNWAY
+	local runway_pane to controll_pane:ADDVBOX().
+	
+	set gui["runway_select_menu"] to runway_pane:ADDPOPUPMENU().
+	for key in get_runways():KEYS {
+		gui:runway_select_menu:ADDOPTION(key).
+	}
 
 
 	// UTILS
