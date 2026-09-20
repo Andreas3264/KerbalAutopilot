@@ -33,8 +33,8 @@ function get_aircraft_config {
 	set config["roll_response"] to 0.005.	// response factor
 	set config["roll_deg_per_deg"] to 5.	// target roll angle per degree heading error
 
-	//set config["max_pitch"] to 25.		// unused
-	//set config["min_pitch"] to -25.		// unused
+	set config["max_pitch"] to 10.		// max speed angle
+	set config["min_pitch"] to -20.		// min speed angle
 
 	set config["pitch_deploy_limit"] to 23.
 	set config["pitch_response"] to 0.2.	// response factor
@@ -42,10 +42,17 @@ function get_aircraft_config {
 	set config["vspeed_per_m"] to 0.1.	// target vertical speed per altitude
 	set config["max_vspeed"] to 30.		// maximum target vertical speed
 
-	set config["pitch_trim_gain"] to 0.1.
+	set config["pitch_trim_gain"] to 1.
 	set config["pitch_trim"] to 0.
 	
 	set config["speed_response"] to 1 / 10.
+
+	set config["runway_altitude_offset"] to 6.		// correction for landing altitude
+	set config["landing_vspeed"] to 2.		// target vertical speed at touchdown
+	set config["landing_grade"] to 0.2.		// grade of the approach
+	set config["landing_grade_grade"] to 0.5.		// vertical acceleration of flare
+	set config["landing_speed"] to 120.		// target landing speed
+	set config["runway_downrange_offset"] to 100.	// distance downrange to touchdown
 
 	return config.
 }

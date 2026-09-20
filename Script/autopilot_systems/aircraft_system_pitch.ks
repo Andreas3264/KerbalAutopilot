@@ -14,8 +14,19 @@ function get_commanded_altitude_PD {
 	local target_vspeed to altitude_error * aircraft_state:CONFIG:VSPEED_PER_M.
 	local target_vspeed to target_vspeed + target_altitude_rate.
 	local target_vspeed to clamp(target_vspeed, -aircraft_state:CONFIG:MAX_VSPEED, aircraft_state:CONFIG:MAX_VSPEED).
-	local vspeed_error to target_vspeed - aircraft_state:TELEMETRY:VSPEED.
 
+	return get_commanded_vspeed(target_vspeed, aircraft_state).
+}
+
+function get_commanded_vspeed {
+	parameter target_vspeed, aircraft_state.
+
+	local vspeed_max to sin(aircraft_state:CONFIG:MAX_PITCH) * aircraft_state:TELEMETRY:AIRSPEED.
+	local vspeed_min to sin(aircraft_state:CONFIG:MIN_PITCH) * aircraft_state:TELEMETRY:AIRSPEED.
+
+	local target_vspeed to clamp(target_vspeed, vspeed_min, vspeed_max).
+
+	local vspeed_error to target_vspeed - aircraft_state:TELEMETRY:VSPEED.
 	local response_f to aircraft_state:CONFIG:PITCH_RESPONSE / (aircraft_state:TELEMETRY:DYNAMIC_PRESSURE * aircraft_state:CONFIG:PITCH_DEPLOY_LIMIT).
 	local response to response_f * vspeed_error.
 

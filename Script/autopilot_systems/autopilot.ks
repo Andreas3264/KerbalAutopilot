@@ -81,11 +81,11 @@ function handle_gui_pitch {
 	set gui:INPUT_ALTITUDE_TEXT:TEXT to gui:INPUT_ALTITUDE + " m".
 	
 	if (gui:altitude_glideslope_button:PRESSED) {
-		//maintain_altitude_adv(glide_slope_altitude(), 50).
-		
 		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
 		local glide_slope_altitude to get_altitude_to_runway(selected_runway, aircraft_state).
-		set ship:control:pitch to get_commanded_altitude(glide_slope_altitude, aircraft_state) + ship:CONTROL:PILOTPITCH.
+		local input_altitude to gui:INPUT_ALTITUDE.
+		local target_altitude to min(glide_slope_altitude, input_altitude).
+		set ship:control:pitch to get_commanded_altitude(target_altitude, aircraft_state) + ship:CONTROL:PILOTPITCH.
 		//set altitude_label:TEXT to round(glide_slope_altitude(), 0) + " m".
 	} else if (gui:altitude_input_button:PRESSED) {
 		set ship:control:pitch to get_commanded_altitude(gui:INPUT_ALTITUDE, aircraft_state) + ship:CONTROL:PILOTPITCH.
@@ -190,7 +190,7 @@ function handle_gui_systems {
 	parameter gui, aircraft_state.
 
 	// autobrake
-	if (gui:autobrake_armed_button:PRESSED and aircraft_state:TELEMETRY:RADAR_ALTITUDE < 10) {
+	if (gui:autobrake_armed_button:PRESSED and aircraft_state:TELEMETRY:RADAR_ALTITUDE < 10 and abs(aircraft_state:TELEMETRY:VSPEED) < 0.5) {
 		set BRAKES to true.
 		lock THROTTLE to 0.
 	}

@@ -2,16 +2,15 @@
 function get_altitude_to_runway {
 	parameter runway, aircraft_state.
 
-	local altitude_offset to 6.				// TODO: define magic constants
-	local landing_speed to 120.				// TODO: define magic constants
-	local grade_min to 1 / landing_speed.			// TODO: define magic constants
-	local grade_max to 0.2.					// TODO: define magic constants
-	local grade_grade to 0.5 / (landing_speed * landing_speed).// TODO: define magic constants
-	local downrang_landing_distance to 300.			// TODO: define magic constants
-
 	local distance_to_runway to get_distance_to_runway(runway, aircraft_state).
 
-	return runway:ALTITUDE + altitude_offset + get_glide_slope_altitude_for_distance(distance_to_runway + downrang_landing_distance, grade_min, grade_max, grade_grade).
+	return 	runway:ALTITUDE + 
+		aircraft_state:CONFIG:RUNWAY_ALTITUDE_OFFSET + 
+		get_glide_slope_altitude_for_distance(
+			distance_to_runway + aircraft_state:CONFIG:RUNWAY_DOWNRANGE_OFFSET,
+			aircraft_state:CONFIG:LANDING_VSPEED / aircraft_state:CONFIG:LANDING_SPEED,
+			aircraft_state:CONFIG:LANDING_GRADE,
+			aircraft_state:CONFIG:LANDING_GRADE_GRADE / (aircraft_state:CONFIG:LANDING_SPEED * aircraft_state:CONFIG:LANDING_SPEED)).
 }
 
 function get_glide_slope_altitude_for_distance {
