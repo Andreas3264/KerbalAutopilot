@@ -89,7 +89,8 @@ function get_autopilot_gui {
 	for key in get_runways():KEYS {
 		gui:runway_select_menu:ADDOPTION(key).
 	}
-
+	set gui["terminal_debug_button"] to runway_pane:ADDCHECKBOX("Terminal debug", false).
+	set gui["visual_debug_button"] to runway_pane:ADDCHECKBOX("Visual debug", false).
 
 	// UTILS
 	local util_pane to controll_pane:ADDVBOX().

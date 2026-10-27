@@ -49,10 +49,10 @@ function get_aircraft_config {
 
 	set config["runway_altitude_offset"] to 6.		// correction for landing altitude
 	set config["landing_vspeed"] to 2.		// target vertical speed at touchdown
-	set config["landing_grade"] to 0.2.		// grade of the approach
+	set config["landing_grade"] to 0.1.		// grade of the approach
 	set config["landing_grade_grade"] to 0.5.		// vertical acceleration of flare
 	set config["landing_speed"] to 120.		// target landing speed
-	set config["runway_downrange_offset"] to 100.	// distance downrange to touchdown
+	set config["runway_downrange_offset"] to 400.	// distance downrange to touchdown
 
 	return config.
 }
@@ -82,11 +82,11 @@ function get_aircraft_telemetry {
 	set state["HSPEED"] to SHIP:GROUNDSPEED.
 
 	//TODO: make mass independant
-	//set state["thrust"] to 0.
-	//LIST ENGINES IN myVariable.
-	//for eng in myVariable {
-    	//	set state["thrust"] to state["thrust"] + eng:THRUST.
-	//}.
+	set state["thrust"] to 0.
+	LIST ENGINES IN myVariable.
+	for eng in myVariable {
+    		set state["thrust"] to state["thrust"] + eng:THRUST.
+	}.
 
 	
 	set state["pitch_angle"] to (90 - vectorangle(UP:FOREVECTOR, FACING:FOREVECTOR)).

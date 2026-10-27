@@ -48,26 +48,27 @@ function get_angle_to_runway {
 function get_distance_to_runway {
 	parameter runway, aircraft_state.
 
-	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, 0).
-	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END, 0).
-	local runway_len   to (runway_end - runway_start):MAG.
-	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, 0).
-
-	return (runway_end - ship_pos):MAG - runway_len.
+	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
+	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
+	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
+	local runway_dir   to (runway_end - runway_start):NORMALIZED.
+	local runway_to_ship to (ship_pos - runway_start).
+	local dist to VDOT(-runway_dir, runway_to_ship).
+	return dist.
 }
 
 // left is +, right is -
 function get_distance_to_runway_center_line {
 	parameter runway, aircraft_state.
 
-	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, 0).
-	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   0).
+	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
+	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
+	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
 	local runway_dir   to (runway_end - runway_start):NORMALIZED.
 	local runway_up    to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
-	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, 0).
-	local ship_to_runway to (runway_start - ship_pos).
-	
-	local dist to VDOT(VCRS(runway_dir, ship_to_runway), runway_up).
+	local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
+	local runway_to_ship to (ship_pos - runway_start).
+	local dist to VDOT(runway_right, runway_to_ship).
 	return dist.
 }
 
