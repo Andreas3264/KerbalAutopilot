@@ -5,7 +5,7 @@ clearguis().
 clearscreen.
 
 local autopilot_gui to get_autopilot_gui().
-local aircraft_state to get_aircraft_state().
+local aircraft_state to get_aircraft_state(autopilot_gui).
 
 local runway_vec to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,1,0),"",1.0,FALSE,0.2,TRUE,FALSE).
 local flare_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(1,1,0),"",1.0,FALSE,0.2,FALSE,FALSE).
@@ -13,6 +13,8 @@ local glide_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,0,1),"",1.0,FALSE,0.2,FALSE,
 local glide_low_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,0,1),"",1.0,FALSE,0.2,FALSE,FALSE).
 
 CORE:PART:GETMODULE("kOSProcessor"):DOEVENT("Open Terminal").
+
+set CONFIG:IPU to 2000.
 
 until false {
 	autopilot_loop().
@@ -26,7 +28,7 @@ until false {
 }
 
 function autopilot_loop {
-	update_aircraft_state(aircraft_state).
+	update_aircraft_state(autopilot_gui, aircraft_state).
 
 	show_runway_debug(autopilot_gui, aircraft_state).
 
@@ -97,48 +99,51 @@ function show_runway_debug {
 function terminal_debug_print {
 	parameter gui, aircraft_state.
 
-	set display_string to display_string + "dt " + round(aircraft_state:TELEMETRY:DT, 3) + char(10).
+	set display_string to display_string
+	+ "dt  " + round(aircraft_state:TELEMETRY:DT, 3) + char(10)
+	+ "ins " + round((aircraft_state:TELEMETRY:DT / 0.02) * CONFIG:IPU, 0) + char(10)
+	+ "ipu " + CONFIG:IPU + char(10).
 
 	if(not gui:terminal_debug_button:PRESSED){return.}
 
 	if(true) { // runway info
 		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
-		set display_string to display_string + "runway center L " + round(get_distance_to_runway_center_line(selected_runway, aircraft_state), 2) + char(10).
-		set display_string to display_string + "runway distance " + round(get_distance_to_runway(selected_runway, aircraft_state), 2) + char(10).
-		set display_string to display_string + "runway angle    " + round(get_angle_to_runway(selected_runway, aircraft_state), 2) + char(10).
-		set display_string to display_string + "runway altitude " + round(get_altitude_to_runway(selected_runway, aircraft_state), 2) + char(10).
-		set display_string to display_string + "run alt error   " + round(aircraft_state:TELEMETRY:ALTITUDE - get_altitude_to_runway(selected_runway, aircraft_state), 2) + char(10).
-		set display_string to display_string + " " + char(10).
+		set display_string to display_string
+		+ "runway center L " + round(get_distance_to_runway_center_line(selected_runway, aircraft_state), 2) + char(10)
+		+ "runway distance " + round(get_distance_to_runway(selected_runway, aircraft_state), 2) + char(10)
+		+ "runway angle    " + round(get_angle_to_runway(selected_runway, aircraft_state), 2) + char(10)
+		+ "runway altitude " + round(get_altitude_to_runway(selected_runway, aircraft_state), 2) + char(10)
+		+ "run alt error   " + round(aircraft_state:TELEMETRY:ALTITUDE - get_altitude_to_runway(selected_runway, aircraft_state), 2) + char(10)
+		+ " " + char(10).
 	}
 
 	if(true) { // attitude
-		set display_string to display_string + "pitch       " + round(aircraft_state:TELEMETRY:PITCH_ANGLE, 2) + char(10).
-		set display_string to display_string + "AoA         " + round(aircraft_state:TELEMETRY:ANGLE_OF_ATTACK, 2) + char(10).
-		set display_string to display_string + "yaw         " + round(aircraft_state:TELEMETRY:COMPASS_ANGLE, 2) + char(10).
-		set display_string to display_string + "roll        " + round(aircraft_state:TELEMETRY:ROLL_ANGLE, 2) + char(10).
-		set display_string to display_string + " " + char(10).
+		set display_string to display_string
+		+ "pitch       " + round(aircraft_state:TELEMETRY:PITCH_ANGLE, 2) + char(10)
+		+ "AoA         " + round(aircraft_state:TELEMETRY:ANGLE_OF_ATTACK, 2) + char(10)
+		+ "yaw         " + round(aircraft_state:TELEMETRY:COMPASS_ANGLE, 2) + char(10)
+		+ "roll        " + round(aircraft_state:TELEMETRY:ROLL_ANGLE, 2) + char(10)
+		+ " " + char(10).
 	}
 
 	if(true) {
-		set display_string to display_string + "altitude      " + round(aircraft_state:TELEMETRY:ALTITUDE, 2) + char(10).
-		set display_string to display_string + "v speed       " + round(aircraft_state:TELEMETRY:VSPEED, 2) + char(10).
-		set display_string to display_string + "air speed     " + round(aircraft_state:TELEMETRY:AIRSPEED, 2) + char(10).
-		set display_string to display_string + "dynamic press " + round(aircraft_state:TELEMETRY:DYNAMIC_PRESSURE, 2) + char(10).
-		set display_string to display_string + " " + char(10).
+		set display_string to display_string
+		+ "altitude      " + round(aircraft_state:TELEMETRY:ALTITUDE, 2) + char(10)
+		+ "v speed       " + round(aircraft_state:TELEMETRY:VSPEED, 2) + char(10)
+		+ "air speed     " + round(aircraft_state:TELEMETRY:AIRSPEED, 2) + char(10)
+		+ "dynamic press " + round(aircraft_state:TELEMETRY:DYNAMIC_PRESSURE, 2) + char(10)
+		+ " " + char(10).
 	}
 
-	
 	if(true) {
-		set display_string to display_string + "pitch input  " + round(ship:control:pitch, 2) + char(10).
-		set display_string to display_string + "pitch trim   " + round(aircraft_state:CONFIG:PITCH_TRIM, 2) + char(10).
-		set display_string to display_string + "yaw input    " + round(ship:control:yaw, 2) + char(10).
-		set display_string to display_string + "roll input   " + round(ship:control:roll, 2) + char(10).
-		set display_string to display_string + "thrust    kN " + round(aircraft_state:TELEMETRY:THRUST, 2) + char(10).
-		set display_string to display_string + " " + char(10).
+		set display_string to display_string
+		+ "pitch input  " + round(ship:control:pitch, 2) + char(10)
+		+ "pitch trim   " + round(aircraft_state:CONFIG:PITCH_TRIM, 2) + char(10)
+		+ "yaw input    " + round(ship:control:yaw, 2) + char(10)
+		+ "roll input   " + round(ship:control:roll, 2) + char(10)
+		+ "thrust    kN " + round(aircraft_state:TELEMETRY:THRUST, 2) + char(10)
+		+ " " + char(10).
 	}
-	
-	//set display_string to display_string + "pitch rate  " + aircraft_state:TELEMETRY:PITCH_ANGLE_RATE + char(10).
-	//set display_string to display_string + "pitch rate2 " + aircraft_state:TELEMETRY:PITCH_ANGLE_RATE_RATE + char(10).
 }
 
 

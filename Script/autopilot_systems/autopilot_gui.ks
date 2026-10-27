@@ -96,7 +96,7 @@ function get_autopilot_gui {
 	local util_pane to controll_pane:ADDVBOX().
 
 	set gui["autobrake_button"] to util_pane:ADDCHECKBOX("Autobrake", true).
-	set gui["autobrake_armed_button"] to util_pane:ADDCHECKBOX("Autobrake arm", false).
+	set gui["autobrake_armed_button"] to util_pane:ADDCHECKBOX("Autobrake arm", true).
 	set gui["autogear_button"] to util_pane:ADDCHECKBOX("Autogear", true).
 
 

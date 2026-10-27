@@ -47,28 +47,28 @@ function get_angle_to_runway {
 // signed distance
 function get_distance_to_runway {
 	parameter runway, aircraft_state.
-
-	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
-	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
-	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
-	local runway_dir   to (runway_end - runway_start):NORMALIZED.
-	local runway_to_ship to (ship_pos - runway_start).
-	local dist to VDOT(-runway_dir, runway_to_ship).
-	return dist.
+	return aircraft_state:CACHE:SHIP_TO_RUNWAY_DIST.
+	//local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
+	//local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
+	//local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
+	//local runway_dir   to (runway_end - runway_start):NORMALIZED.
+	//local runway_to_ship to (ship_pos - runway_start).
+	//local dist to VDOT(-runway_dir, runway_to_ship).
+	//return dist.
 }
 
 // left is +, right is -
 function get_distance_to_runway_center_line {
 	parameter runway, aircraft_state.
-
-	local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
-	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
-	local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
-	local runway_dir   to (runway_end - runway_start):NORMALIZED.
-	local runway_up    to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
-	local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
-	local runway_to_ship to (ship_pos - runway_start).
-	local dist to VDOT(runway_right, runway_to_ship).
-	return dist.
+	return aircraft_state:CACHE:SHIP_TO_CENTER_DIST.
+	//local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
+	//local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
+	//local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
+	//local runway_dir   to (runway_end - runway_start):NORMALIZED.
+	//local runway_up    to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
+	//local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
+	//local runway_to_ship to (ship_pos - runway_start).
+	//local dist to VDOT(runway_right, runway_to_ship).
+	//return dist.
 }
 

@@ -1,18 +1,25 @@
 
 function get_aircraft_state {
+	parameter autopilot_gui.
 	local state to lexicon().
 	set state["telemetry"] to get_aircraft_telemetry().
 	set state["config"] to get_aircraft_config().
+	set state["cache"] to get_aircraft_cache(autopilot_gui, state).
 
 	return state.
 }
 
 function update_aircraft_state {
-	parameter aircraft_state.
+	parameter autopilot_gui, aircraft_state.
+
+	// wait for next frame
+	local frame_switch_detection to time:seconds.
+	until time:seconds > frame_switch_detection { }
 
 	local old_tel to aircraft_state:TELEMETRY.
 	local new_tel to get_aircraft_telemetry().
 	set aircraft_state:TELEMETRY to new_tel.
+	set aircraft_state:CACHE to get_aircraft_cache(autopilot_gui, aircraft_state).
 
 	local dt to new_tel:TIME - old_tel:TIME.
 
@@ -22,6 +29,44 @@ function update_aircraft_state {
 	//set aircraft_state:TELEMETRY:PITCH_ANGLE_RATE to (new_tel:PITCH_ANGLE - old_tel:PITCH_ANGLE) / dt.
 	//set aircraft_state:TELEMETRY:PITCH_ANGLE_RATE_RATE to (new_tel:PITCH_ANGLE_RATE - old_tel:PITCH_ANGLE_RATE) / dt.
 	set aircraft_state:TELEMETRY:ROLL_ANGLE_RATE to (new_tel:ROLL_ANGLE - old_tel:ROLL_ANGLE) / dt.
+}
+
+function get_aircraft_cache {
+	parameter autopilot_gui, aircraft_state.
+
+	local cache to lexicon().
+	
+	local runway to get_runway(gui:runway_select_menu:VALUE).
+	set cache["selected_runway"] to runway.
+	
+	local ship_pos to  cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
+	//set cache["ship_position"] to ship_pos.
+
+	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
+	//set cache["runway_start"] to runway_start.
+	
+	local runway_end to cord_to_point(runway:LAT_END, runway:LNG_END, runway:ALTITUDE).
+	//set cache["runway_end"] to runway_end.
+
+	local runway_dir to (runway_end - runway_start):NORMALIZED.
+	//set cache["runway_dir"] to runway_dir.
+
+	local runway_up to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
+	//set cache["runway_up"] to runway_up.
+
+	local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
+	//set cache["runway_right"] to runway_right.
+
+	local ship_to_runway to (runway_start - ship_pos).
+	//set cache["ship_to_runway"] to ship_to_runway.
+
+	local ship_to_center_dist to VDOT(runway_right, -ship_to_runway).
+	set cache["ship_to_center_dist"] to ship_to_center_dist.
+
+	local ship_to_runway_dist to VDOT(-runway_dir, -ship_to_runway).
+	set cache["ship_to_runway_dist"] to ship_to_center_dist.
+
+	return cache.
 }
 
 function get_aircraft_config {
@@ -58,10 +103,6 @@ function get_aircraft_config {
 }
 
 function get_aircraft_telemetry {
-
-	// wait for next frame
-	local frame_switch_detection to time:seconds.
-	until time:seconds > frame_switch_detection { }	
 
 	local state to lexicon().
 
