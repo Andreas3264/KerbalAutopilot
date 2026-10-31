@@ -56,7 +56,7 @@ set runways["baikerbanur_198"] to new_runway(20.718367, -146.473616, 20.491157, 
 // lat end	20.718367
 // lng end	-146.473616
 // alt		418
-set runways["baikerbanur_18"] to new_runway(-20.491157, -146.550809, 20.718367, -146.473616, 418).
+set runways["baikerbanur_18"] to new_runway(20.491157, -146.550809, 20.718367, -146.473616, 418).
 
 // Harvester Airfield 259
 // lat start	-56.281700

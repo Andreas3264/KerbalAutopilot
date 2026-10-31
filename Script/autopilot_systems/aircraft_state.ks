@@ -64,7 +64,7 @@ function get_aircraft_cache {
 	set cache["ship_to_center_dist"] to ship_to_center_dist.
 
 	local ship_to_runway_dist to VDOT(-runway_dir, -ship_to_runway).
-	set cache["ship_to_runway_dist"] to ship_to_center_dist.
+	set cache["ship_to_runway_dist"] to ship_to_runway_dist.
 
 	return cache.
 }
