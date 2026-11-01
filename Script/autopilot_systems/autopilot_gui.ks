@@ -15,7 +15,7 @@ function get_autopilot_gui {
 	SET altitude_label:STYLE:ALIGN TO "CENTER".
 
 	local altitude_custom_pane to altitude_pane:ADDHBOX().
-	set gui["altitude_glideslope_button"] to altitude_custom_pane:ADDRADIOBUTTON("LND").
+	set gui["altitude_nav_button"] to altitude_custom_pane:ADDRADIOBUTTON("NAV").
 	set gui["altitude_input_button"] to altitude_custom_pane:ADDRADIOBUTTON("IN").
 	set gui["altitude_manual_button"] to altitude_custom_pane:ADDRADIOBUTTON("MAN", true).
 
@@ -40,8 +40,8 @@ function get_autopilot_gui {
 	SET heading_label:STYLE:ALIGN TO "CENTER".
 
 	local heading_custom_pane to heading_pane:ADDHBOX().
-	set gui["heading_target_button"] to heading_custom_pane:ADDRADIOBUTTON("TAR").
-	set gui["heading_runway_button"] to heading_custom_pane:ADDRADIOBUTTON("RUN").
+	//set gui["heading_target_button"] to heading_custom_pane:ADDRADIOBUTTON("TAR").
+	set gui["heading_nav_button"] to heading_custom_pane:ADDRADIOBUTTON("NAV").
 	set gui["heading_input_button"] to heading_custom_pane:ADDRADIOBUTTON("IN").
 	set gui["heading_manual_button"] to heading_custom_pane:ADDRADIOBUTTON("MAN", true).
 
@@ -90,8 +90,11 @@ function get_autopilot_gui {
 	for key in get_runways():KEYS {
 		gui:runway_select_menu:ADDOPTION(key).
 	}
+	SET gui:runway_select_menu:STYLE:WIDTH TO 220.
+	SET gui:runway_select_menu:MAXVISIBLE TO 30.
 	set gui["terminal_debug_button"] to runway_pane:ADDCHECKBOX("Terminal debug", false).
 	set gui["visual_debug_button"] to runway_pane:ADDCHECKBOX("Visual debug", false).
+
 
 	// UTILS
 	local util_pane to controll_pane:ADDVBOX().
@@ -99,6 +102,13 @@ function get_autopilot_gui {
 	set gui["autobrake_button"] to util_pane:ADDCHECKBOX("Autobrake", true).
 	set gui["autobrake_armed_button"] to util_pane:ADDCHECKBOX("Autobrake arm", true).
 	set gui["autogear_button"] to util_pane:ADDCHECKBOX("Autogear", true).
+
+
+	// NAVIGATION
+	local nav_pane to controll_pane:ADDVBOX().
+
+	set gui["nav_tar_button"] to nav_pane:ADDRADIOBUTTON("NAV-TAR").
+	set gui["nav_lnd_button"] to nav_pane:ADDRADIOBUTTON("NAV-LND", true).
 
 
 	my_gui:SHOW().

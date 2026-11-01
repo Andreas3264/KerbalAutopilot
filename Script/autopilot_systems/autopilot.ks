@@ -174,13 +174,16 @@ function handle_gui_pitch {
 	
 	set gui:INPUT_ALTITUDE_TEXT:TEXT to gui:INPUT_ALTITUDE + " m".
 	
-	if (gui:altitude_glideslope_button:PRESSED) {
+	if (gui:altitude_nav_button:PRESSED and gui:nav_lnd_button:PRESSED) {
 		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
 		local glide_slope_altitude to get_altitude_to_runway(selected_runway, aircraft_state).
 		local input_altitude to gui:INPUT_ALTITUDE.
 		local target_altitude to min(glide_slope_altitude, input_altitude).
 		set ship:control:pitch to get_commanded_altitude(target_altitude, aircraft_state) + ship:CONTROL:PILOTPITCH.
 		//set altitude_label:TEXT to round(glide_slope_altitude(), 0) + " m".
+	} else if (gui:altitude_nav_button:PRESSED and gui:nav_tar_button:PRESSED) {
+		set ship:control:pitch to get_commanded_altitude(gui:INPUT_ALTITUDE, aircraft_state) + ship:CONTROL:PILOTPITCH.
+		//set altitude_label:TEXT to input_target_alt + " m".
 	} else if (gui:altitude_input_button:PRESSED) {
 		set ship:control:pitch to get_commanded_altitude(gui:INPUT_ALTITUDE, aircraft_state) + ship:CONTROL:PILOTPITCH.
 		//set altitude_label:TEXT to input_target_alt + " m".
@@ -211,13 +214,13 @@ function handle_gui_heading {
 	set gui:input_heading to round(gui:input_heading, 0).
 	set gui:input_heading_text:text to gui:input_heading + " deg".
 	
-	if (gui:heading_runway_button:PRESSED) {
+	if (gui:heading_nav_button:PRESSED and gui:nav_lnd_button:PRESSED) {
 		local selected_runway to get_runway(gui:runway_select_menu:VALUE).
 		local target_heading to get_angle_to_runway(selected_runway, aircraft_state).
 		set ship:control:roll to get_commanded_heading(target_heading, aircraft_state) + ship:CONTROL:PILOTROLL.
 		//set heading_label:TEXT to round(get_angle_to_runway(), 1) + " deg".
 
-	} else if (gui:heading_target_button:PRESSED) {
+	} else if (gui:heading_nav_button:PRESSED and gui:nav_tar_button:PRESSED) {
 		local heading_to_target to 0.
 		if(hastarget) {
 			set heading_to_target to LATLNG(target:geoposition:lat, target:geoposition:lng):heading.
@@ -270,12 +273,15 @@ function handle_gui_speed {
 		LOCK THROTTLE to 0.
 		//set speed_label:TEXT to "BRAKE".
 	} else {
-		if (gui:speed_nav_button:PRESSED) {
+		if (gui:speed_nav_button:PRESSED and gui:nav_lnd_button:PRESSED) {
 			local selected_runway to get_runway(gui:runway_select_menu:VALUE).
 			local nav_speed to get_speed_to_runway(selected_runway, aircraft_state).
 			local target_speed to clamp(nav_speed, aircraft_state:CONFIG:LANDING_SPEED, gui:input_speed).
 			LOCK THROTTLE to get_commanded_speed(target_speed, aircraft_state).
 			// speed label text
+		} else if (gui:speed_nav_button:PRESSED and gui:nav_tar_button:PRESSED) {
+			LOCK THROTTLE to get_commanded_speed(gui:input_speed, aircraft_state).
+			//set speed_label:TEXT to input_target_speed + " m/s".
 		} else if (gui:speed_input_button:PRESSED) {
 			LOCK THROTTLE to get_commanded_speed(gui:input_speed, aircraft_state).
 			//set speed_label:TEXT to input_target_speed + " m/s".
