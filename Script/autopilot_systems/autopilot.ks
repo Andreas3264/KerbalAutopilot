@@ -270,7 +270,13 @@ function handle_gui_speed {
 		LOCK THROTTLE to 0.
 		//set speed_label:TEXT to "BRAKE".
 	} else {
-		if (gui:speed_input_button:PRESSED) {
+		if (gui:speed_nav_button:PRESSED) {
+			local selected_runway to get_runway(gui:runway_select_menu:VALUE).
+			local nav_speed to get_speed_to_runway(selected_runway, aircraft_state).
+			local target_speed to clamp(nav_speed, aircraft_state:CONFIG:LANDING_SPEED, gui:input_speed).
+			LOCK THROTTLE to get_commanded_speed(target_speed, aircraft_state).
+			// speed label text
+		} else if (gui:speed_input_button:PRESSED) {
 			LOCK THROTTLE to get_commanded_speed(gui:input_speed, aircraft_state).
 			//set speed_label:TEXT to input_target_speed + " m/s".
 		} else if (gui:speed_manual_button:PRESSED) {

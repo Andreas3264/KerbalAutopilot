@@ -32,6 +32,13 @@ function get_glide_slope_altitude_for_distance {
 	}
 }
 
+// target speed for approach to this runway
+function get_speed_to_runway {
+	parameter runway, aircraft_state.
+	return aircraft_state:CONFIG:LANDING_SPEED
+		+ (get_distance_to_runway(runway, aircraft_state) - aircraft_state:CONFIG:FINAL_DISTANCE) * 0.002.
+}
+
 // target heading for approach to this runway
 function get_angle_to_runway {
 	parameter runway, aircraft_state.

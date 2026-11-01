@@ -109,7 +109,7 @@ function get_aircraft_config {
 	set config["landing_vspeed"] to 2.		// target vertical speed at touchdown
 	set config["landing_grade"] to 0.1.		// grade of the approach
 	set config["landing_grade_grade"] to 0.5.		// vertical acceleration of flare
-	set config["landing_speed"] to 120.		// target landing speed
+	set config["landing_speed"] to 150.		// target landing speed
 	set config["runway_downrange_offset"] to 300.	// distance downrange to touchdown
 
 	set config["final_turn_radius"] to 10000.		// turning radius for final

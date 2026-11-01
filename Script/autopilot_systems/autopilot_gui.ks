@@ -66,6 +66,7 @@ function get_autopilot_gui {
 	SET speed_label:STYLE:ALIGN TO "CENTER".
 
 	local speed_custom_pane to speed_pane:ADDHBOX().
+	set gui["speed_nav_button"] to speed_custom_pane:ADDRADIOBUTTON("NAV").
 	set gui["speed_input_button"] to speed_custom_pane:ADDRADIOBUTTON("IN").
 	set gui["speed_manual_button"] to speed_custom_pane:ADDRADIOBUTTON("MAN", true).
 
