@@ -36,39 +36,28 @@ function get_glide_slope_altitude_for_distance {
 function get_angle_to_runway {
 	parameter runway, aircraft_state.
 
-	local runway_angle to dir_from_to(runway:LAT_START, runway:LNG_START, runway:LAT_END, runway:LNG_END).
-	local dist to get_distance_to_runway_center_line(runway, aircraft_state).
-	local target_angle to clamp(90 * dist / 10000, -90, 90).		// TODO: define magic constants
-	set target_angle to target_angle + clamp(dist / 100, -10, 10).	// TODO: define magic constants
-	set target_angle to target_angle + clamp(dist / 20, -1, 1).		// TODO: define magic constants
-	return mod((clamp(target_angle, -90, 90) + runway_angle + 360), 360).
+	local dist to get_distance_to_runway(runway, aircraft_state).
+	local dist_c to get_distance_to_runway_center_line(runway, aircraft_state).
+	if(abs(dist_c) < aircraft_state:CONFIG:FINAL_TURN_RADIUS 
+		and dist < (aircraft_state:CONFIG:FINAL_TURN_RADIUS + aircraft_state:CONFIG:FINAL_DISTANCE)) {
+		local target_angle to clamp(90 * dist_c / aircraft_state:CONFIG:FINAL_TURN_RADIUS, -90, 90).
+		set target_angle to target_angle + clamp(dist_c / 100, -10, 10).		// TODO: define magic constants
+		set target_angle to target_angle + clamp(dist_c / 20, -1, 1).		// TODO: define magic constants
+		return mod((clamp(target_angle, -90, 90) + runway:ANGLE + 360), 360).
+	} else {
+		return aircraft_state:CACHE:DIR_TO_FINAL.
+	}
 }
 
 // signed distance
 function get_distance_to_runway {
 	parameter runway, aircraft_state.
 	return aircraft_state:CACHE:SHIP_TO_RUNWAY_DIST.
-	//local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
-	//local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
-	//local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
-	//local runway_dir   to (runway_end - runway_start):NORMALIZED.
-	//local runway_to_ship to (ship_pos - runway_start).
-	//local dist to VDOT(-runway_dir, runway_to_ship).
-	//return dist.
 }
 
 // left is +, right is -
 function get_distance_to_runway_center_line {
 	parameter runway, aircraft_state.
 	return aircraft_state:CACHE:SHIP_TO_CENTER_DIST.
-	//local ship_pos     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
-	//local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
-	//local runway_end   to cord_to_point(runway:LAT_END,   runway:LNG_END,   runway:ALTITUDE).
-	//local runway_dir   to (runway_end - runway_start):NORMALIZED.
-	//local runway_up    to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
-	//local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
-	//local runway_to_ship to (ship_pos - runway_start).
-	//local dist to VDOT(runway_right, runway_to_ship).
-	//return dist.
 }
 

@@ -36,3 +36,20 @@ function dir_from_to {
 	local p2 to LATLNG(lat_to, lng_to).
 	return mod(360+arctan2(sin(p2:lng-p1:lng)*cos(p2:lat),cos(p1:lat)*sin(p2:lat)-sin(p1:lat)*cos(p2:lat)*cos(p2:lng-p1:lng)),360).
 }
+
+function dir_for_vec {
+	parameter vec.
+	
+	local pointing to vec:NORMALIZED.
+
+	local east is vcrs(ship:up:vector, ship:north:vector).
+	local trig_x is vdot(ship:north:vector, pointing).
+	local trig_y is vdot(east, pointing).
+	local result is arctan2(trig_y, trig_x).
+	
+	if result < 0 {
+		return 360 + result.
+	} else {
+		return result.
+	}
+}

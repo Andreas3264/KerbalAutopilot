@@ -40,7 +40,7 @@ function get_aircraft_cache {
 	set cache["selected_runway"] to runway.
 	
 	local ship_pos to  cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, aircraft_state:TELEMETRY:ALTITUDE).
-	//set cache["ship_position"] to ship_pos.
+	set cache["ship_position"] to ship_pos.
 
 	local runway_start to cord_to_point(runway:LAT_START, runway:LNG_START, runway:ALTITUDE).
 	//set cache["runway_start"] to runway_start.
@@ -54,17 +54,30 @@ function get_aircraft_cache {
 	local runway_up to (cord_to_point(runway:LAT_START, runway:LNG_START, 100000) - runway_start):NORMALIZED.
 	//set cache["runway_up"] to runway_up.
 
-	local runway_right to VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
+	local runway_right to -VCRS(runway_dir, runway_up). // left handed: (Left X Forward = UP)
 	//set cache["runway_right"] to runway_right.
 
 	local ship_to_runway to (runway_start - ship_pos).
 	//set cache["ship_to_runway"] to ship_to_runway.
 
-	local ship_to_center_dist to VDOT(runway_right, -ship_to_runway).
+	local ship_to_center_dist to VDOT(runway_right, ship_to_runway).
 	set cache["ship_to_center_dist"] to ship_to_center_dist.
 
-	local ship_to_runway_dist to VDOT(-runway_dir, -ship_to_runway).
+	local ship_pos_0     to cord_to_point(aircraft_state:TELEMETRY:LATITUDE, aircraft_state:TELEMETRY:LONGITUDE, 0).
+	local runway_end_0   to cord_to_point(runway:LAT_END,   runway:LNG_END,   0).
+	local ship_to_runway_dist to (runway_end_0 - ship_pos_0):MAG - (runway_end - runway_start):MAG.
 	set cache["ship_to_runway_dist"] to ship_to_runway_dist.
+
+	local dir_to_target_point to runway_start
+		- runway_dir * aircraft_state:CONFIG:FINAL_DISTANCE
+		- runway_right * sign(ship_to_center_dist) * aircraft_state:CONFIG:FINAL_TURN_RADIUS
+		- ship_pos_0.
+	set cache["ship_to_final_point"] to dir_to_target_point.
+
+	local dir_to_final to dir_for_vec(dir_to_target_point)
+		//wikipedia.org/wiki/Angular_diameter
+		+ sign(ship_to_center_dist) * ARCSIN(min(1, (aircraft_state:CONFIG:FINAL_TURN_RADIUS) / dir_to_target_point:MAG)).
+	set cache["dir_to_final"] to dir_to_final.
 
 	return cache.
 }
@@ -97,7 +110,10 @@ function get_aircraft_config {
 	set config["landing_grade"] to 0.1.		// grade of the approach
 	set config["landing_grade_grade"] to 0.5.		// vertical acceleration of flare
 	set config["landing_speed"] to 120.		// target landing speed
-	set config["runway_downrange_offset"] to 400.	// distance downrange to touchdown
+	set config["runway_downrange_offset"] to 300.	// distance downrange to touchdown
+
+	set config["final_turn_radius"] to 10000.		// turning radius for final
+	set config["final_distance"]    to 15000.		// distance for final
 
 	return config.
 }

@@ -11,6 +11,7 @@ local runway_vec to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,1,0),"",1.0,FALSE,0.2,TRUE,F
 local flare_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(1,1,0),"",1.0,FALSE,0.2,FALSE,FALSE).
 local glide_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,0,1),"",1.0,FALSE,0.2,FALSE,FALSE).
 local glide_low_vec  to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,0,1),"",1.0,FALSE,0.2,FALSE,FALSE).
+local final_vec to VECDRAW(V(0,0,0),V(0,0,0),RGB(0,1,1),"",1.0,FALSE,0.2,TRUE,FALSE).
 
 CORE:PART:GETMODULE("kOSProcessor"):DOEVENT("Open Terminal").
 
@@ -30,13 +31,12 @@ until false {
 function autopilot_loop {
 	update_aircraft_state(autopilot_gui, aircraft_state).
 
-	show_runway_debug(autopilot_gui, aircraft_state).
-
 	handle_gui_pitch(autopilot_gui, aircraft_state).
 	handle_gui_heading(autopilot_gui, aircraft_state).
 	handle_gui_speed(autopilot_gui, aircraft_state).
 	handle_gui_systems(autopilot_gui, aircraft_state).
 
+	show_runway_debug(autopilot_gui, aircraft_state).
 	terminal_debug_print(autopilot_gui, aircraft_state).
 }
 
@@ -48,6 +48,7 @@ function show_runway_debug {
 		set flare_vec:SHOW to false.
 		set glide_vec:SHOW to false.
 		set glide_low_vec:SHOW to false.
+		set final_vec:SHOW to false.
 		return.
 	}
 
@@ -94,6 +95,10 @@ function show_runway_debug {
 	set glide_low_vec:SHOW to TRUE.
 	set glide_low_vec:START to glide_start_low.
 	set glide_low_vec:VEC to glide_end - glide_start_low.
+
+	set final_vec:SHOW to TRUE.
+	set final_vec:START to aircraft_state:CACHE:SHIP_POSITION.
+	set final_vec:VEC to aircraft_state:CACHE:SHIP_TO_FINAL_POINT.
 }
 
 function terminal_debug_print {

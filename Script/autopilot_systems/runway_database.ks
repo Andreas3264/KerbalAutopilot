@@ -16,6 +16,7 @@ function new_runway {
 	set runway["lat_end"] to lat_end.
 	set runway["lng_end"] to lng_end.
 	set runway["altitude"] to altitude.
+	set runway["angle"] to dir_from_to(runway:LAT_START, runway:LNG_START, runway:LAT_END, runway:LNG_END).
 	return runway.
 }
 
